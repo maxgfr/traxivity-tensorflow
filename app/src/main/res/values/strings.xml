@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TraxivityTensorFlow</string>
+    <string name="buttonNetwork">Load Tensorflow model</string>
+    <string name="textViewNetwork">Tensorflow model is not loaded</string>
+    <string name="textViewWalking">Walking</string>
+    <string name="textViewUpstairs">Upstairs</string>
+    <string name="textViewStanding">Standing</string>
+    <string name="textViewSitting">Sitting</string>
+    <string name="textViewJogging">Jogging</string>
+    <string name="textViewDownstairs">Downstairs</string>
+</resources>
