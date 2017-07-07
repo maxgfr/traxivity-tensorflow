@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     private TextView textViewStanding;
 
     private static final int N_SAMPLES = 500;
+    private TensorFlowClassifier mClassifier;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private static List<Float> x;
@@ -45,7 +47,13 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
         buttonLoadNetwork.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-
+                loadNetwork();
+                if (mClassifier == null) {
+                    textViewLoadNetwork.setText("TensorFlow model null");
+                } else {
+                    textViewLoadNetwork.setText("TensorFlow model loaded sucessful");
+                }
+                buttonLoadNetwork.setEnabled(false);
             }
         });
 
@@ -58,11 +66,13 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
         mSensorManager.registerListener(this, mAccelerometer , SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
@@ -80,32 +90,35 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     }
 
     private void loadNetwork () {
-
-    }
-    
-    private void dispRes () {
-        textViewDownstairs.setText("");
-        textViewJogging.setText("");
-        textViewSitting.setText("");
-        textViewStanding.setText("");
-        textViewUpstairs.setText("");
-        textViewWalking.setText("");
+        mClassifier = TensorFlowClassifier.getInstance(getAssets(), "opt_cnn_wrist500_tf.pb", "input", "output", true);
     }
 
     private void activityPrediction() {
         if(x.size() == N_SAMPLES && y.size() == N_SAMPLES && z.size() == N_SAMPLES) {
+            dispRes(mClassifier.recognize(x,y,z));
             x.clear();
             y.clear();
             z.clear();
         }
     }
 
+    private void dispRes (List<String> array) {
+        textViewDownstairs.setText(array.get(0));
+        textViewJogging.setText(array.get(1));
+        textViewSitting.setText(array.get(2));
+        textViewStanding.setText(array.get(3));
+        textViewUpstairs.setText(array.get(4));
+        textViewWalking.setText(array.get(5));
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        activityPrediction();
-        x.add(event.values[0]);
-        y.add(event.values[1]);
-        z.add(event.values[2]);
+        if (mClassifier != null) {
+            activityPrediction();
+            x.add(event.values[0]);
+            y.add(event.values[1]);
+            z.add(event.values[2]);
+        }
     }
 
     @Override
