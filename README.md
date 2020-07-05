@@ -1,2 +1,3 @@
-# TraxivityTensorFlow
-traxivity which works thanks to tensorflow
+# traxivity-tensorflow
+
+Traxivity app which works thanks to tensorflow
